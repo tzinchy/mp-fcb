@@ -30,10 +30,7 @@ class OldApartRepository:
             row = result.fetchone()
             return row[0] if row else {}
         
-    async def get_old_apart_stages(): 
-        async with self.create_session() as session: 
-            pass
-        
+
 
         
 
