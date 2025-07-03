@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -6,12 +6,7 @@ import {
   flexRender,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-
-const defaultData = [
-  { affair_id: 1, fio: 'Иванов И.И.', house_address: 'г. Москва, ВАО, Богородское, Миллионная ул., д.15 кор.2', apart_number: '12', status: 'В работе', problems: {} },
-  { affair_id: 2, fio: 'Сидоров С.С.', house_address: 'г. Москва, ВАО, Богородское, Миллионная ул., д.15 кор.2', apart_number: '23', status: 'Завершено', problems: {} },
-  { affair_id: 3, fio: 'Петров П.П.', house_address: 'г. Москва, ВАО, Богородское, Миллионная ул., д.16', apart_number: '56', status: 'Не начато', problems: {} },
-]
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const defaultColumns = [
   {
@@ -37,10 +32,26 @@ const defaultColumns = [
 ]
 
 export default function AffairTableTanstack() {
-  const [data] = useState(() => defaultData)
+  const [data, setData] = useState([])
   const [sorting, setSorting] = useState([])
   const [selectedRowId, setSelectedRowId] = useState();
   const columns = useMemo(() => defaultColumns, [])
+
+  useEffect(() => {
+    fetch(`${backendUrl}/old_apart`)
+      .then(res => res.json())
+      .then(json => {
+        // Преобразуем словарь в массив
+        const converted = Object.entries(json).map(([id, entry]) => ({
+          affair_id: Number(id),
+          ...entry,
+        }))
+        setData(converted)
+      })
+      .catch(err => {
+        console.error('Ошибка при загрузке данных:', err)
+      })
+  }, [])
 
   const table = useReactTable({
     data,
@@ -55,9 +66,11 @@ export default function AffairTableTanstack() {
   })
 
   return (
-    <div className="p-4">
-      <table className="min-w-full border border-gray-300 text-sm">
-        <thead className="bg-gray-100">
+<div className="px-4">
+  <div className="overflow-hidden border border-gray-300 rounded">
+    <div className="max-h-[calc(100vh-170px)] overflow-y-auto">
+      <table className="min-w-full text-sm border-separate border-spacing-0">
+        <thead className="sticky top-0 bg-white z-10 shadow">
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map(header => {
@@ -67,7 +80,7 @@ export default function AffairTableTanstack() {
                   <th
                     key={header.id}
                     onClick={isSortable ? header.column.getToggleSortingHandler() : undefined}
-                    className={`px-3 py-2 border-b text-left font-medium cursor-${isSortable ? 'pointer' : 'default'}`}
+                    className="px-3 py-2 border-b text-left font-medium cursor-pointer bg-white"
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                     {sortDir === 'asc' ? ' ▲' : sortDir === 'desc' ? ' ▼' : ''}
@@ -90,5 +103,7 @@ export default function AffairTableTanstack() {
         </tbody>
       </table>
     </div>
+  </div>
+</div>
   )
 }
