@@ -24,6 +24,13 @@ export default function AffairsPage() {
       isDetailsVisible ? 'mr-[35vw]' : ''
     }`}
   >
+    <div
+    className="h-[70px] flex items-center justify-center">
+        <h1
+        className="text-xl flex items-center justify-center">
+            Проблемные
+        </h1>
+    </div>
     <AffairTableTanstack />
   </div>
 
