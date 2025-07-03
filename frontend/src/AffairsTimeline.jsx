@@ -50,41 +50,60 @@ export default function AffairsTimeline({ problems, setNextPages }) {
       {/* Таймлайн */}
       {activeProblem && (
         <div className="relative border-l-2 border-gray-300 ml-6">
-          {activeProblem.stages.map((stage, index) => (
-            <div key={stage.id} className="mb-10 ml-4 relative">
-              <div className="absolute -left-5 top-1 w-3 h-3 bg-blue-600 rounded-full shadow"></div>
+{activeProblem.stages.map((stage, index) => (
+  <div key={stage.id} className="mb-10 ml-4 relative">
+    <div
+      className={`absolute -left-5 top-1 w-3 h-3 rounded-full shadow ${
+        index === activeProblem.stages.length - 1 ? 'bg-green-600' : 'bg-blue-600'
+      }`}
+    ></div>
 
-              <div className="text-base font-semibold text-gray-900">{stage.label}</div>
+    <div className="text-base font-semibold text-gray-900">{stage.label}</div>
 
-              {stage.created_at && (
-                <div className="text-sm text-gray-700">{stage.created_at}</div>
-              )}
+    {stage.created_at && (
+      <div className="text-sm text-gray-700">{stage.created_at}</div>
+    )}
 
-              {(stage.date || stage.number) && (
-                <div className="text-sm text-gray-600 mt-1">
-                  <span className="font-medium">
-                    Док. №: {stage.number || '—'} от {stage.date || '—'}
-                  </span>
+    {(stage.date || stage.number) && (
+      <div className="text-sm text-gray-600 mt-1">
+        <span className="font-medium">
+          Док. №: {stage.number || '—'} от {stage.date || '—'}
+        </span>
+      </div>
+    )}
+
+    {index === activeProblem.stages.length - 1 && Array.isArray(stage.next_stage) && (
+      <>
+        {stage.next_stage.length > 0 && (
+          <div className="mt-2 text-sm text-gray-500 italic space-y-1">
+            {stage.next_stage.map((next, i) => {
+              const nextId = Object.keys(next)[0]
+              const nextLabel = next[nextId]
+              return (
+                <div key={i}>
+                  → Возможный шаг: <span className="text-blue-600">{nextLabel}</span>
                 </div>
-              )}
+              )
+            })}
+          </div>
+        )}
 
-              {/* Только если последний этап */}
-              {index === activeProblem.stages.length - 1 && stage.next_stage && (
-                <div className="mt-4">
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
-                  >
-                    Завершить «{stage.label}»
-                  </button>
-                </div>
-              )}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+          >
+            Завершить «{stage.label}»
+          </button>
+        </div>
+      </>
+    )}
 
-              {index < activeProblem.stages.length - 1 && (
-                <div className="absolute left-[-6px] top-5 w-px h-10 bg-gray-300"></div>
-              )}
-            </div>
-          ))}
+    {index < activeProblem.stages.length - 1 && (
+      <div className="absolute left-[-6px] top-5 w-px h-10 bg-gray-300"></div>
+    )}
+  </div>
+))}
         </div>
       )}
 
