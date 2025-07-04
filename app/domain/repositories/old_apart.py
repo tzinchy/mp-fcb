@@ -35,20 +35,21 @@ class OldApartRepository:
         async with self.create_session() as session: 
             result = await session.execute(text("""
             WITH stage_info AS (
-            SELECT 
-                o.affair_id,
-                p.problem_id,
-                jsonb_build_object(
-                    'stage_id', sh.stage_id,
-                    'stage', s.stage,
-                    'doc_date', sh.doc_date,
-                    'document_number', sh.document_number,
-                    'created_at', sh.created_at,
-                    'updated_at', sh.updated_at,
-                    'stage_status', ss.stage_status,
-					'next_stages', s.next_stage
-                ) AS stage_json,
-                sh.created_at
+                SELECT 
+                    o.affair_id,
+                    p.problem_id,
+                    p.problem,
+                    jsonb_build_object(
+                        'stage_id', sh.stage_id,
+                        'stage', s.stage,
+                        'doc_date', sh.doc_date,
+                        'document_number', sh.document_number,
+                        'created_at', sh.created_at,
+                        'updated_at', sh.updated_at,
+                        'stage_status', ss.stage_status,
+                        'next_stages', s.next_stage
+                    ) AS stage_json,
+                    sh.created_at
                 FROM 
                     mprg.stage_history sh
                 JOIN mprg.stage s USING (stage_id)
@@ -58,27 +59,15 @@ class OldApartRepository:
                 WHERE affair_id = :affair_id
             )
             SELECT 
-                affair_id,
-                jsonb_object_agg(
-                    problem_id::text,
-                    (
-                        SELECT jsonb_agg(si.stage_json ORDER BY si.created_at)
-                        FROM stage_info si
-                        WHERE si.affair_id = stage_info.affair_id 
-                        AND si.problem_id = stage_info.problem_id
-                    )
-                ) AS problem_stages
+                problem_id,
+                problem,
+                jsonb_agg(stage_json ORDER BY created_at) AS stages
             FROM 
                 stage_info
             GROUP BY 
-                affair_id
-            ORDER BY 
-                affair_id;
+                problem_id,
+                problem;
             """
             ), {'affair_id' : affair_id})
-            row = result.fetchone()
-            return {
-            "affair_id": row[0],
-            "problem_stages": row[1]
-            }
-
+            result = result.fetchall()
+            return [row._mapping for row in result]
