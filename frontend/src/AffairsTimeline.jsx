@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import StageCompletionForm from './StageCompletionForm'
 import { parseISO, format } from 'date-fns'
+import {CircleCheck, Circle} from 'lucide-react'
 
 export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setactiveStageHistoryId }) {
   const [activeTab, setActiveTab] = useState(
@@ -49,7 +50,7 @@ useEffect(() => {
             onClick={() => setActiveTab(problem.problem_id)}
             className={`px-4 py-2 text-sm rounded-t ${
               activeTab === problem.problem_id
-                ? 'bg-white border border-b-transparent font-semibold text-blue-600'
+                ? 'bg-white border border-b-transparent shadow-xl font-semibold text-gray-600'
                 : 'bg-gray-100 text-gray-600'
             }`}
           >
@@ -63,11 +64,7 @@ useEffect(() => {
         <div className="relative border-l-2 border-gray-300 ml-6">
 {activeProblem.stages.map((stage, index) => (
   <div key={stage.id} className="mb-10 ml-4 relative">
-    <div
-      className={`absolute -left-5 top-1 w-3 h-3 rounded-full shadow ${
-        index === activeProblem.stages.length - 1 ? 'bg-green-600' : 'bg-blue-600'
-      }`}
-    ></div>
+    {index === activeProblem.stages.length - 1 ? ( <Circle color='orange' fill='white' className='absolute left-[-29px]'/>) : ( <CircleCheck color='green' fill='white' className='absolute left-[-29px]'/>)}
 
     <div className="text-base font-semibold text-gray-900">{stage.label}</div>
 
@@ -76,9 +73,9 @@ useEffect(() => {
     )}
 
     {(stage.date || stage.number) && (
-      <div className="text-sm text-gray-600 mt-1">
-        <span className="font-medium">
-          Док. №: {stage.number || '—'} от {stage.date || '—'}
+      <div className="text-sm text-gray-800 mt-1">
+        <span className="font-['Courier_New']">
+          Док: №{stage.number || '—'} от {format(parseISO(stage.date), 'dd.MM.yyyy') || '—'}
         </span>
       </div>
     )}
