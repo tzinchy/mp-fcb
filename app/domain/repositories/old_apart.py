@@ -40,14 +40,15 @@ class OldApartRepository:
                     p.problem_id,
                     p.problem,
                     jsonb_build_object(
+                        'id', sh.stage_id,
                         'stage_id', sh.stage_id,
-                        'stage', s.stage,
-                        'doc_date', sh.doc_date,
+                        'label', s.stage,
+                        'date', sh.doc_date,
                         'document_number', sh.document_number,
                         'created_at', sh.created_at,
                         'updated_at', sh.updated_at,
                         'stage_status', ss.stage_status,
-                        'next_stages', s.next_stage
+                        'next_stage', s.next_stage
                     ) AS stage_json,
                     sh.created_at
                 FROM 
