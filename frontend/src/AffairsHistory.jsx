@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AffairsTimeline from "./AffairsTimeline";
 import StageCompletionForm from "./StageCompletionForm";
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 export default function AffairsDetails({
   apartmentDetails,
@@ -13,71 +14,68 @@ export default function AffairsDetails({
 }) {
   const [nextStages, setNextStages] = useState([]);
   const [activeStageName, setActiveStageName] = useState('');
+  const [stages, setStages] = useState([]);
+
+  useEffect(() => {
+  if (!apartmentDetails?.affair_id) return;
+
+  fetch(`${backendUrl}/old_apart/${apartmentDetails.affair_id}/get_stages`)
+    .then(res => res.json())
+    .then(json => {
+      setStages(json); // ожидается массив проблем с этапами
+    })
+    .catch(console.error);
+}, [apartmentDetails?.affair_id]);
 
   function handleClose() {
     setIsDetailsVisible(false);
     setSelectedRow(false);
   }
 
-  const stages = [
-    {
-      problem_id: 1,
-      problem_name: "Очередник",
-      stages: [
-        {
-          id: 1,
-          label: "Не начато",
-          stage_id: 1,
-          date: "",
-          number: "",
-          created_at: "2024-12-02",
-          next_stage: [{ 2: "В процессе", stage_id: 2 }],
-        },
-        {
-          id: 2,
-          label: "В процессе",
-          stage_id: 2,
-          date: "2025-01-15",
-          number: 45345,
-          created_at: "2025-01-03",
-          next_stage: [{ 3: "Ожидание ответа от минобороны", stage_id: 3 }],
-        },
-        {
-          id: 3,
-          label: "Ожидание ответа от минобороны",
-          stage_id: 3,
-          date: "",
-          number: '',
-          created_at: "2025-01-17",
-          next_stage: [{ 4: "Ожидание ответа от Росимущества", stage_id: 4 }, { 2: "В процессе", stage_id: 2 }],
-        },
-      ],
-    },
-    {
-      problem_id: 3,
-      problem_name: "Федеральная собственность",
-      stages: [
-        {
-          id: 1,
-          label: "Не начато",
-          stage_id: 1,
-          date: "",
-          number: "",
-          created_at: "2024-12-06",
-          next_stage: [{ 2: "В процессе", stage_id: 2 }],
-        },
-        {
-          id: 2,
-          label: "В процессе",
-          stage_id: 2,
-          date: "",
-          number: "",
-          created_at: "2025-01-10",
-          next_stage: [{ 3: "Ожидание ответа от минобороны", stage_id: 3 }],
-        },
-      ],
-    },
-  ];
+//   const stages = [
+//   {
+//     "problem_id": 1,
+//     "problem_name": "Очередник",
+//     "stages": [
+//       {
+//         "id": 1,
+//         "date": "2025-07-03",
+//         "label": "Первый этап",
+//         "number": "test1",
+//         "stage_id": 1,
+//         "created_at": "2025-07-03T13:25:57.834032+03:00",
+//         "next_stage": [
+//           {
+//             "stage_id": 2
+//           }
+//         ],
+//         "updated_at": "2025-07-03T13:25:57.834032+03:00",
+//         "stage_status": "Не начато"
+//       }
+//     ]
+//   },
+//   {
+//     "problem_id": 2,
+//     "problem_name": "Много судов",
+//     "stages": [
+//       {
+//         "id": 2,
+//         "date": "2025-07-03",
+//         "label": "Первый этап ",
+//         "number": "test1",
+//         "stage_id": 2,
+//         "created_at": "2025-07-03T13:25:57.834032+03:00",
+//         "next_stage": [
+//           {
+//             "stage_id": 3
+//           }
+//         ],
+//         "updated_at": "2025-07-03T13:25:57.834032+03:00",
+//         "stage_status": "Не начато"
+//       }
+//     ]
+//   }
+// ]
 
   return (
     <div
