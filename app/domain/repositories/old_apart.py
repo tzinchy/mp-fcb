@@ -80,7 +80,7 @@ class OldApartRepository:
     
     async def set_new_stage(self, affair_id : int, currentStageId : int, current_stage_history_id : int, doc_date : date, doc_number : str, next_stage_id : int):
         async with self.create_session() as session: 
-            result = await session.execute(text(
+            await session.execute(text(
                 """
                 WITH update_center AS (
                     UPDATE mprg.stage_history 
@@ -88,8 +88,8 @@ class OldApartRepository:
                     WHERE affair_id = :affair_id 
                     AND stage_history_id = :current_stage_history_id
                 )
-                INSERT INTO mprg.stage_history (affair_id, stage_id, document_number, stage_status_id) 
-                VALUES (:affair_id, :next_stage, :doc_number, 1)
+                INSERT INTO mprg.stage_history (affair_id, stage_id, document_number, stage_status_id, doc_date) 
+                VALUES (:affair_id, :next_stage, :doc_number, 1, :doc_date)
                 """
             ), {'affair_id' : affair_id, 
                 'currentStageId' : currentStageId,
@@ -101,6 +101,8 @@ class OldApartRepository:
                 )
             
             await session.commit()
-            return result.rowcount
+            return_row = await self.get_stage_history(affair_id=affair_id)
+            result_from_get_new_stage = return_row.fechall()
+            return [row._mapping for row in result_from_get_new_stage]
         
         
