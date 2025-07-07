@@ -3,18 +3,10 @@ import AffairTableTanstack from "./AffairsTable";
 import React, { useState } from "react";
 
 export default function AffairsPage() {
-    const [isDetailsVisible, setIsDetailsVisible] = useState(true);
+    const [isDetailsVisible, setIsDetailsVisible] = useState(false);
     const [selectedRow, setSelectedRow] = useState(false);
     // const [apartmentDetails, setApartmentDetails] = useState(null);
-    const apartmentDetails = {
-        house_address: "г. Москва, ВАО, Богородское, Миллионная ул., д.15 к.2",
-        apart_number: "12",
-        fio: "Иванов И.И.",
-        district: "ВАО",
-        municipal_district: "Богородское",
-        affair_id: 101,
-        rsm_apart_id: 202,
-        }
+const apartmentDetails = selectedRow || null
 
     return(
 <div className="relative flex w-full">
@@ -31,7 +23,12 @@ export default function AffairsPage() {
             Проблемные
         </h1>
     </div>
-    <AffairTableTanstack />
+    <AffairTableTanstack
+  onRowClick={(rowData) => {
+    setSelectedRow(rowData)
+    setIsDetailsVisible(true)
+  }}
+/>
   </div>
 
   {/* Правая часть — модальное окно */}

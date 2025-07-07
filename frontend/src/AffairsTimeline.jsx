@@ -20,6 +20,16 @@ export default function AffairsTimeline({ problems, setNextPages }) {
     }
   }, [lastStage])
 
+useEffect(() => {
+  if (problems.length > 0) {
+    setActiveTab(problems[0].problem_id)
+  }
+}, [problems])
+
+useEffect(() => {
+  setShowForm(false)
+}, [activeTab])
+
   const handleSubmit = (data) => {
     console.log('⏭ Завершение этапа:', {
       currentStageId: lastStage?.stage_id,
@@ -72,32 +82,30 @@ export default function AffairsTimeline({ problems, setNextPages }) {
       </div>
     )}
 
-    {index === activeProblem.stages.length - 1 && Array.isArray(stage.next_stage) && (
-      <>
-        {stage.next_stage.length > 0 && (
-          <div className="mt-2 text-sm text-gray-500 italic space-y-1">
-            {stage.next_stage.map((next, i) => {
-              const nextId = Object.keys(next)[0]
-              const nextLabel = next[nextId]
-              return (
-                <div key={i}>
-                  → Возможный шаг: <span className="text-blue-600">{nextLabel}</span>
-                </div>
-              )
-            })}
+{index === activeProblem.stages.length - 1 && Array.isArray(stage.next_stage) && stage.next_stage.length > 0 && (
+  <>
+    <div className="mt-2 text-sm text-gray-500 italic space-y-1">
+      {stage.next_stage.map((next, i) => {
+        const nextId = Object.keys(next)[0]
+        const nextLabel = next[nextId]
+        return (
+          <div key={i}>
+            → Возможный шаг: <span className="text-blue-600">{nextLabel}</span>
           </div>
-        )}
+        )
+      })}
+    </div>
 
-        <div className="mt-4">
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
-          >
-            Завершить «{stage.label}»
-          </button>
-        </div>
-      </>
-    )}
+    <div className="mt-4">
+      <button
+        onClick={() => setShowForm(true)}
+        className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+      >
+        Завершить «{stage.label}»
+      </button>
+    </div>
+  </>
+)}
 
     {index < activeProblem.stages.length - 1 && (
       <div className="absolute left-[-6px] top-5 w-px h-10 bg-gray-300"></div>

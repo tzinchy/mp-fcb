@@ -16,7 +16,7 @@ const defaultColumns = [
   { accessorKey: 'status', header: 'Статус' },
 ]
 
-export default function AffairTableTanstack() {
+export default function AffairTableTanstack({ onRowClick }) {
   const [rawData, setRawData] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [sorting, setSorting] = useState([])
@@ -106,7 +106,7 @@ export default function AffairTableTanstack() {
             </thead>
             <tbody>
               {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className="hover:bg-gray-50">
+                <tr key={row.id} className="hover:bg-gray-50" onClick={() => onRowClick?.(row.original)}>
                   {row.getVisibleCells().map(cell => (
                     <td key={cell.id} className="px-3 py-2 border-b">
                       {flexRender(
