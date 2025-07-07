@@ -44,7 +44,7 @@ class OldApartRepository:
                         'stage_id', sh.stage_id,
                         'label', s.stage,
                         'date', sh.doc_date,
-                        'document_number', sh.document_number,
+                        'number', sh.document_number,
                         'created_at', sh.created_at,
                         'updated_at', sh.updated_at,
                         'stage_status', ss.stage_status,
