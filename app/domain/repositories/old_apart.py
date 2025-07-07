@@ -48,7 +48,7 @@ class OldApartRepository:
                         'created_at', sh.created_at,
                         'updated_at', sh.updated_at,
                         'stage_status', ss.stage_status,
-                        'next_stage', jsonb_build_array(s.next_stage)
+                        'next_stage', s.next_stage
                     ) AS stage_json,
                     sh.created_at
                 FROM 
