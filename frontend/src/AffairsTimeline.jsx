@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import StageCompletionForm from './StageCompletionForm'
+import { parseISO, format } from 'date-fns'
 
-export default function AffairsTimeline({ problems, setNextPages }) {
+export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setactiveStageHistoryId }) {
   const [activeTab, setActiveTab] = useState(
     problems.length > 0 ? problems[0].problem_id : null
   )
@@ -71,7 +72,7 @@ useEffect(() => {
     <div className="text-base font-semibold text-gray-900">{stage.label}</div>
 
     {stage.created_at && (
-      <div className="text-sm text-gray-700">{stage.created_at}</div>
+      <div className="text-xs text-gray-500">{format(parseISO(stage.created_at), 'dd.MM.yyyy HH:mm')}</div>
     )}
 
     {(stage.date || stage.number) && (
@@ -85,15 +86,11 @@ useEffect(() => {
 {index === activeProblem.stages.length - 1 && Array.isArray(stage.next_stage) && stage.next_stage.length > 0 && (
   <>
     <div className="mt-2 text-sm text-gray-500 italic space-y-1">
-      {stage.next_stage.map((next, i) => {
-        const nextId = Object.keys(next)[0]
-        const nextLabel = next[nextId]
-        return (
-          <div key={i}>
-            → Возможный шаг: <span className="text-blue-600">{nextLabel}</span>
-          </div>
-        )
-      })}
+{stage.next_stage.map((next, i) => (
+  <div key={i} className='text-xs'>
+    → Доступно: <span className="text-xs text-blue-600">{next.status_name}</span>
+  </div>
+))}
     </div>
 
     <div className="mt-4">
@@ -131,6 +128,8 @@ useEffect(() => {
             <StageCompletionForm
               nextStages={currentNextStages}
               onSubmit={handleSubmit}
+              apartmentDetails={apartmentDetails}
+              activeStageHistoryId={lastStage.stage_history_id}
             />
           </div>
         </div>
