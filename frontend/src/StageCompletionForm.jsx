@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function StageCompletionForm({ nextStages = [], onSubmit, activeStageName }) {
+export default function StageCompletionForm({ nextStages = [], onSubmit, activeStageName, apartmentDetails, activeStageHistoryId }) {
   const [docNumber, setDocNumber] = useState('')
   const [docDate, setDocDate] = useState('')
   const [note, setNote] = useState('')
@@ -16,10 +16,12 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
     }
 
     onSubmit({
+      affair_id: apartmentDetails.affair_id,
       doc_number: docNumber,
       doc_date: docDate,
       note,
-      next_stage_id: selectedStage,
+      next_stage_id: Number(selectedStage),
+      current_stage_history_id: activeStageHistoryId
     })
   }
 
@@ -67,15 +69,11 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
             className="w-full border rounded px-3 py-1 text-sm"
           >
             <option value="">Выберите этап</option>
-            {nextStages.map((option, idx) => {
-              const id = Object.keys(option)[0]
-              const label = option[id]
-              return (
-                <option key={idx} value={id}>
-                  {label}
-                </option>
-              )
-            })}
+{nextStages.map((option, idx) => (
+  <option key={idx} value={option.stage_id}>
+    {option.status_name}
+  </option>
+))}
           </select>
         </div>
       )}

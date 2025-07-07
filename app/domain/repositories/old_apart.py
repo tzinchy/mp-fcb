@@ -41,6 +41,7 @@ class OldApartRepository:
                     p.problem as problem_name,
                     jsonb_build_object(
                         'id', sh.stage_id,
+                        'stage_history_id', sh.stage_history_id,                       
                         'stage_id', sh.stage_id,
                         'label', s.stage,
                         'date', sh.doc_date,
@@ -72,3 +73,7 @@ class OldApartRepository:
             ), {'affair_id' : affair_id})
             result = result.fetchall()
             return [row._mapping for row in result]
+        
+    async def update_stage_history(self, params: dict):
+
+        return

@@ -14,6 +14,7 @@ export default function AffairsDetails({
 }) {
   const [nextStages, setNextStages] = useState([]);
   const [activeStageName, setActiveStageName] = useState('');
+  const [activeStageHistoryId, setactiveStageHistoryId] = useState();
   const [stages, setStages] = useState([]);
 
   useEffect(() => {
@@ -135,7 +136,11 @@ export default function AffairsDetails({
 
       {/* Контент: только таймлайн */}
       <div className="p-4 overflow-y-auto">
-        <AffairsTimeline problems={stages} setNextStages={setNextStages} setActiveStageName={setActiveStageName}/>
+        <AffairsTimeline 
+        problems={stages} 
+        setNextStages={setNextStages} 
+        setActiveStageName={setActiveStageName}
+        apartmentDetails={apartmentDetails}/>
       </div>
       <div>
       {/* <StageCompletionForm
