@@ -21,5 +21,5 @@ async def next_stages_for_apart(set_new_stage : SetNewStage):
                                                     current_stage_history_id=set_new_stage.current_stage_history_id, 
                                                     doc_date=set_new_stage.doc_date, 
                                                     doc_number=set_new_stage.doc_number,
-                                                    next_stage=set_new_stage.next_stage)
+                                                    next_stage=set_new_stage.next_stage_id)
     return result

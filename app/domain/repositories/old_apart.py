@@ -77,14 +77,8 @@ class OldApartRepository:
             ), {'affair_id' : affair_id})
             result = result.fetchall()
             return [row._mapping for row in result]
-<<<<<<< HEAD
-        
-    async def update_stage_history(self, params: dict):
-
-        return
-=======
     
-    async def set_new_stage(self, affair_id : int, currentStageId : int, current_stage_history_id : int, doc_date : date, doc_number : str, next_stage : int):
+    async def set_new_stage(self, affair_id : int, currentStageId : int, current_stage_history_id : int, doc_date : date, doc_number : str, next_stage_id : int):
         async with self.create_session() as session: 
             result = await session.execute(text(
                 """
@@ -102,7 +96,7 @@ class OldApartRepository:
                 'current_stage_history_id':current_stage_history_id, 
                 'doc_date' : doc_date, 
                 'doc_number' : doc_number, 
-                'next_stage' : next_stage,
+                'next_stage' : next_stage_id,
                 'doc_number' : doc_number}
                 )
             
@@ -110,4 +104,3 @@ class OldApartRepository:
             return result.rowcount
         
         
->>>>>>> e3603ba (add set_next_stage)
