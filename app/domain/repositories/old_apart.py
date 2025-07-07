@@ -38,7 +38,7 @@ class OldApartRepository:
                 SELECT 
                     o.affair_id,
                     p.problem_id,
-                    p.problem,
+                    p.problem as problem_name,
                     jsonb_build_object(
                         'id', sh.stage_id,
                         'stage_id', sh.stage_id,
@@ -61,13 +61,13 @@ class OldApartRepository:
             )
             SELECT 
                 problem_id,
-                problem,
+                problem_name,
                 jsonb_agg(stage_json ORDER BY created_at) AS stages
             FROM 
                 stage_info
             GROUP BY 
                 problem_id,
-                problem;
+                problem_name;
             """
             ), {'affair_id' : affair_id})
             result = result.fetchall()
