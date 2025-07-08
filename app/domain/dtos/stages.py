@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from datetime import date
 
 class StageHistoryResponse(BaseModel):
@@ -8,11 +8,11 @@ class StageHistoryResponse(BaseModel):
 
 class SetNewStage(BaseModel):
     affair_id : int 
-    currentStageId : int
+    currentStageId : Optional[int]
     current_stage_history_id : int
-    doc_date : date 
-    doc_number : str
-    next_stage_id : int
-    notes : str
+    doc_date : Optional[date] = None 
+    doc_number : Optional[str] = None
+    next_stage_id : Optional[int] = None
+    notes : Optional[str] = None
 
 
