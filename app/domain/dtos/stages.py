@@ -12,10 +12,6 @@ class SetNewStage(BaseModel):
     current_stage_history_id : int
     doc_date : date 
     doc_number : str
-<<<<<<< HEAD
     next_stage_id : int
-=======
-    next_stage : int
->>>>>>> e3603ba (add set_next_stage)
 
 

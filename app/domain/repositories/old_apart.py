@@ -3,14 +3,12 @@ from datetime import date
 from domain.entities.old_apart import OldApart
 from sqlalchemy import Select, text
 from sqlalchemy.orm import sessionmaker
+from domain.dtos.old_apart import OldApartBase
 
 
 class OldApartRepository: 
     def __init__(self, engine : sessionmaker):
         self.create_session = engine
-
-    async def create_old_apart(self, affair_id, fio, house_address, apart_number, problems):
-        pass
         
     async def get_old_apart(self): 
         async with self.create_session() as session: 
@@ -104,5 +102,17 @@ class OldApartRepository:
             return_row = await self.get_stage_history(affair_id=affair_id)
             result_from_get_new_stage = return_row.fechall()
             return [row._mapping for row in result_from_get_new_stage]
+    
+    async def create_old_apart(self, old_apart: OldApartBase) -> OldApart:
+        """Создает новую запись о квартире"""
+        async with self.create_session() as session:
+            apart_data = old_apart.model_dump(exclude_unset=True)
+            apart = OldApart(**apart_data)
+            
+            session.add(apart)
+            await session.commit()
+            await session.refresh(apart)
+            
+            return apart
         
         
