@@ -1,6 +1,7 @@
 from api.v1.dependencies import old_apart_repository
 from domain.dtos.stages import SetNewStage, StageHistoryResponse
 from fastapi import APIRouter
+from domain.dtos.old_apart import OldApartBase
 
 router = APIRouter(prefix='/old_apart', tags=['Проблемные квартиры'])
 
@@ -23,3 +24,9 @@ async def next_stages_for_apart(set_new_stage : SetNewStage):
                                                     doc_number=set_new_stage.doc_number,
                                                     next_stage_id=set_new_stage.next_stage_id)
     return result
+
+@router.post('/create_old_apart')
+async def create_old_apart(
+    old_apart : OldApartBase
+):
+    return await old_apart_repository.create_old_apart(old_apart=old_apart)
