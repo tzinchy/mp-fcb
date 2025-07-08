@@ -72,7 +72,7 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
             <option value="">Выберите этап</option>
 {nextStages.map((option, idx) => (
   <option key={idx} value={option.stage_id}>
-    {option.status_name}
+    {option.stage_name}
   </option>
 ))}
           </select>

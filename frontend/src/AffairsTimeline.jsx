@@ -112,7 +112,7 @@ const handleSubmit = async (data) => {
         <div className="mt-2 text-sm text-gray-500 italic space-y-1">
           {stage.next_stage.map((next, i) => (
             <div key={next.stage_id || i} className="text-xs">
-              → Доступно: <span className="text-xs text-blue-600">{next.status_name}</span>
+              → Доступно: <span className="text-xs text-blue-600">{next.stage_name}</span>
             </div>
           ))}
         </div>
