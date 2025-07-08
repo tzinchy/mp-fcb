@@ -81,7 +81,7 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
 
       {nextStages.length === 1 && (
         <p className="text-sm text-gray-600 italic">
-          Следующий этап: {Object.values(nextStages[0])[0]}
+          Следующий этап: {nextStages[0].stage_name}
         </p>
       )}
 
