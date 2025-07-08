@@ -5,7 +5,8 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
   const [docDate, setDocDate] = useState('')
   const [note, setNote] = useState('')
   const [selectedStage, setSelectedStage] = useState(() => {
-    if (nextStages.length === 1) return Object.keys(nextStages[0])[0]
+    console.log(nextStages)
+    if (nextStages.length === 1) return nextStages[0].stage_id
     return ''
   })
 

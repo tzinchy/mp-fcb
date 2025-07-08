@@ -138,6 +138,7 @@ export default function AffairsDetails({
       <div className="p-4 overflow-y-auto">
         <AffairsTimeline 
         problems={stages} 
+        setStages={setStages}
         setNextStages={setNextStages} 
         setActiveStageName={setActiveStageName}
         apartmentDetails={apartmentDetails}/>
