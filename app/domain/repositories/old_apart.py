@@ -76,18 +76,21 @@ class OldApartRepository:
             result = result.fetchall()
             return [row._mapping for row in result]
     
-    async def set_new_stage(self, affair_id : int, currentStageId : int, current_stage_history_id : int, doc_date : date, doc_number : str, next_stage_id : int):
+    async def set_new_stage(self, affair_id : int, currentStageId : int, current_stage_history_id : int, doc_date : date, doc_number : str, next_stage_id : int, notes : str):
         async with self.create_session() as session: 
             await session.execute(text(
                 """
                 WITH update_center AS (
                     UPDATE mprg.stage_history 
-                    SET stage_status_id = 3
-                    WHERE affair_id = :affair_id 
+                    SET stage_status_id = 3,
+                    document_number = :doc_number,
+                    doc_date = :doc_date,
+                    notes = :notes
+                    WHERE affair_id = :affair_id
                     AND stage_history_id = :current_stage_history_id
                 )
-                INSERT INTO mprg.stage_history (affair_id, stage_id, document_number, stage_status_id, doc_date) 
-                VALUES (:affair_id, :next_stage, :doc_number, 1, :doc_date)
+                INSERT INTO mprg.stage_history (affair_id, stage_id, stage_status_id) 
+                VALUES (:affair_id, :next_stage, 1)
                 """
             ), {'affair_id' : affair_id, 
                 'currentStageId' : currentStageId,
@@ -95,7 +98,8 @@ class OldApartRepository:
                 'doc_date' : doc_date, 
                 'doc_number' : doc_number, 
                 'next_stage' : next_stage_id,
-                'doc_number' : doc_number}
+                'doc_number' : doc_number,
+                'notes' : notes}
                 )
             
             await session.commit()

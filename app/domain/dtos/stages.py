@@ -13,6 +13,6 @@ class SetNewStage(BaseModel):
     doc_date : date 
     doc_number : str
     next_stage_id : int
-    note: str
+    notes : str
 
 
