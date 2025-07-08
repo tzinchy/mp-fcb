@@ -99,9 +99,7 @@ class OldApartRepository:
                 )
             
             await session.commit()
-            return_row = await self.get_stage_history(affair_id=affair_id)
-            result_from_get_new_stage = return_row.fechall()
-            return [row._mapping for row in result_from_get_new_stage]
+            return await self.get_stage_history(affair_id=affair_id)
     
     async def create_old_apart(self, old_apart: OldApartBase) -> OldApart:
         """Создает новую запись о квартире"""

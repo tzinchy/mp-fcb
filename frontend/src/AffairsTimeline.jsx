@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'
 import StageCompletionForm from './StageCompletionForm'
 import { parseISO, format } from 'date-fns'
 import {CircleCheck, Circle} from 'lucide-react'
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setactiveStageHistoryId }) {
+export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setStages }) {
   const [activeTab, setActiveTab] = useState(
     problems.length > 0 ? problems[0].problem_id : null
   )
@@ -32,13 +33,34 @@ useEffect(() => {
   setShowForm(false)
 }, [activeTab])
 
-  const handleSubmit = (data) => {
-    console.log('⏭ Завершение этапа:', {
-      currentStageId: lastStage?.stage_id,
-      ...data,
-    })
-    setShowForm(false)
+const handleSubmit = async (data) => {
+  console.log('⏭ Завершение этапа:', {
+    currentStageId: lastStage?.stage_id,
+    ...data,
+  });
+
+  try {
+    const response = await fetch(`${backendUrl}/old_apart/set_next_stage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        currentStageId: lastStage?.stage_id,
+        ...data,
+      }),
+    });
+
+    if (!response.ok) throw new Error('Ошибка при запросе');
+
+    const json = await response.json();
+    setStages(json); // ожидается массив проблем с этапами
+  } catch (error) {
+    console.error('❌ Ошибка при завершении этапа:', error);
+  } finally {
+    setShowForm(false);
   }
+};
 
   return (
     <div className="p-6">
