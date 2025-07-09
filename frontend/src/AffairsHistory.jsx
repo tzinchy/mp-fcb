@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import AffairsTimeline from "./AffairsTimeline";
 import StageCompletionForm from "./StageCompletionForm";
-const backendUrl = import.meta.env.VITE_BACKEND_URL
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL
+let rsm = '';
 export default function AffairsDetails({
   apartmentDetails,
   apartType = "OldApart",
@@ -16,23 +17,26 @@ export default function AffairsDetails({
   const [activeStageName, setActiveStageName] = useState('');
   const [activeStageHistoryId, setactiveStageHistoryId] = useState();
   const [stages, setStages] = useState([]);
+  
 
   useEffect(() => {
   if (!apartmentDetails?.affair_id) return;
+  rsm = `http://webrsm.mlc.gov:5222/ObjectCard?ObjId=${apartmentDetails.affair_id}&RegisterViewId=KursKpu&isVertical=true&useMasterPage=true`
 
   fetch(`${backendUrl}/old_apart/${apartmentDetails.affair_id}/get_stages`)
+  
     .then(res => res.json())
     .then(json => {
       setStages(json); // ожидается массив проблем с этапами
     })
     .catch(console.error);
-}, [apartmentDetails?.affair_id]);
+}, [apartmentDetails?.affair_id, rsm]);
 
   function handleClose() {
     setIsDetailsVisible(false);
     setSelectedRow(false);
   }
-
+  
 //   const stages = [
 //   {
 //     "problem_id": 1,
@@ -93,12 +97,12 @@ export default function AffairsDetails({
           <h2 className="text-lg font-bold truncate">
             {apartType !== "OldApart"
               ? apartmentDetails?.house_address + ", кв. " + apartmentDetails?.apart_number
-              : apartmentDetails?.fio || ""}
+              : apartmentDetails?.kpu || "-"}
           </h2>
           <p className="text-sm text-gray-600">
             {apartType === "OldApart"
               ? apartmentDetails
-                ? `${apartmentDetails.district}, ${apartmentDetails.municipal_district}, ${apartmentDetails.house_address}, кв. ${apartmentDetails.apart_number}`
+                ? `${apartmentDetails.district || "-"}, ${apartmentDetails.municipal_district || "-"}, ${apartmentDetails.house_address}, кв. ${apartmentDetails.apart_number}`
                 : ""
               : apartmentDetails
               ? `${apartmentDetails.district}, ${apartmentDetails.municipal_district}`
@@ -107,24 +111,27 @@ export default function AffairsDetails({
         </div>
 
         <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-file-text"
-            >
-              <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-              <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-              <path d="M10 9H8" />
-              <path d="M16 13H8" />
-              <path d="M16 17H8" />
-            </svg>
+            
+<a href={rsm} target="_blank" rel="noopener noreferrer">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-file-text hover:text-blue-600 transition-colors"
+  >
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    <path d="M10 9H8" />
+    <path d="M16 13H8" />
+    <path d="M16 17H8" />
+  </svg>
+</a>
           <button
             className="h-10 w-10 p-0 border border-gray-300 rounded-full flex items-center justify-center"
             onClick={handleClose}

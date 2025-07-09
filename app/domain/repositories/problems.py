@@ -5,14 +5,11 @@ class ProblemsRepository:
     def __init__(self, engine : sessionmaker):
         self.create_session = engine
 
-    async def get_old_apart(self): 
+    async def get_all_problems(self): 
         async with self.create_session() as session: 
             result = await session.execute(text('''
                 SELECT problem_id, problem FROM mprg.problems
             '''))
-            row = result.fetchone()
-            return row[0] if row else {}
+            rows = result.fetchall()
+            return [row._mapping for row in rows] if rows else []
         
-
-        
-
