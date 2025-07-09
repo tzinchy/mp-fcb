@@ -17,6 +17,9 @@ class OldApartRepository:
                 o.affair_id,
                 jsonb_build_object(
                     'fio', o.fio,
+                    'district', o.district,
+                    'municipal_district', o.municipal_district,
+                    'kpu', o.kpu,
                     'house_address', o.house_address,
                     'apart_number', o.apart_number,
                     'status', s.status,

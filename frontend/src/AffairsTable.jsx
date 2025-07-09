@@ -10,6 +10,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const defaultColumns = [
   { accessorKey: 'affair_id', header: 'ID' },
+  { accessorKey: 'kpu', header: 'КПУ' },
   { accessorKey: 'fio', header: 'ФИО' },
   { accessorKey: 'house_address', header: 'Адрес дома' },
   { accessorKey: 'apart_number', header: 'Кв.' },
