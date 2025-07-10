@@ -69,6 +69,7 @@ export default function AffairsPage() {
       >
         <div className="h-full flex flex-col shadow-lg bg-white">
           <AffairsDetails
+            onAfterStageComplete={handleReloadTable}
             setIsDetailsVisible={setIsDetailsVisible}
             setSelectedRow={setSelectedRow}
             apartmentDetails={apartmentDetails}

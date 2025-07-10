@@ -11,6 +11,7 @@ export default function AffairsDetails({
   setSelectedRow,
   selectedRowId,
   fetchApartments,
+  onAfterStageComplete,
   className = "",
 }) {
   const [nextStages, setNextStages] = useState([]);
@@ -148,7 +149,9 @@ export default function AffairsDetails({
         setStages={setStages}
         setNextStages={setNextStages} 
         setActiveStageName={setActiveStageName}
-        apartmentDetails={apartmentDetails}/>
+        apartmentDetails={apartmentDetails}
+        onAfterStageComplete={onAfterStageComplete}
+        />
       </div>
       <div>
       {/* <StageCompletionForm
