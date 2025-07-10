@@ -24,6 +24,63 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 class RsmService ():
 
+    def normalize_district(self, value: str) -> str:
+
+        district_mapping = {
+            "Восточный АО": "ВАО",
+            "Центральный АО": "ЦАО",
+            "Северо-Восточный АО": "СВАО",
+            "Новомосковский АО": "НАО",
+            "Люблинский р-н": "ЮВАО",  # Люблинский район относится к Юго-Восточному АО
+            "Юго-Восточный АО": "ЮВАО",
+            "Северо-Западный АО": "СЗАО",
+            "Северный АО": "САО",
+            "Зеленоградский АО": "ЗелАО",
+            "Юго-Западный АО": "ЮЗАО",
+            "Южный АО": "ЮАО",
+            "Вос": "ВАО",
+            "СЗАО": "СЗАО",
+            "Троицкий АО": "ТАО",
+            "Западный АО": "ЗАО",
+            "Зел": "ЗелАО",
+            "С-В": "СВАО",
+            "Южн": "ЮАО",
+            "С-З": "СЗАО",
+            "Зап": "ЗАО",
+            "Цен": "ЦАО",
+            "Ю-З": "ЮЗАО",
+            "ТАО": "ТАО",
+            "Сев": "САО",
+            "НАО": "НАО",
+            "МО": "МО",  # Московская область, если нужно
+            "Ю-В": "ЮВАО",
+            "Якиманка": "ЦАО",  # Район в ЦАО
+            "Тверской": "ЦАО",  # Район в ЦАО
+            "Северное Бутово": "ЮЗАО",  # Район в ЮЗАО
+            "Очаково-Матвеевское": "ЗАО",  # Район в ЗАО
+            "Левобережный": "САО",  # Район в САО
+            "Некрасовка": "ЮВАО",  # Район в ЮВАО
+            "Митино": "СЗАО",  # Район в СЗАО
+            "Крылатское": "ЗАО",  # Район в ЗАО
+            "Бирюлёво Восточное": "ЮАО",  # Район в ЮАО
+            "Академический": "ЮЗАО"  # Район в ЮЗАО
+        }
+
+        if not value:
+            return ""
+        value = value.strip()
+
+        # 1. Точное соответствие
+        if value in district_mapping:
+            return district_mapping[value]
+
+        # 2. Частичное совпадение по подстроке
+        for key, val in district_mapping.items():
+            if key in value:
+                return val
+
+        return value  # если ничего не подошло, вернуть как есть
+
     async def get_kpu_info(self, affair_id :int):
         
         return
@@ -228,14 +285,16 @@ class RsmService ():
                     data = jsonn['Data'][0]
                     response_dict["affair_id"] = int(data['448826'])
                     response_dict["fio"] = data['448827']
-                    response_dict["district"] = data['448828']
+                    response_dict['district'] = self.normalize_district(data.get('448828', ''))
                     response_dict["municipal_district"] = data['448829']
                     response_dict["house_address"] = data['448830']
                     response_dict["apart_number"] = data['448831']
                     response_dict["kpu"] = data['448832']
                     response_dict["unom"] = data['448833']
-                    
+
             print(response_dict)
+
+
         return response_dict
     
 # rsm = RsmService()

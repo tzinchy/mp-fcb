@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react'
+import { forwardRef, useImperativeHandle } from "react";
 import { parseISO, format } from 'date-fns'
 import {
   useReactTable,
@@ -87,7 +88,7 @@ const defaultColumns = [
   },
 ]
 
-export default function AffairTableTanstack({ onRowClick }) {
+const AffairTableTanstack = forwardRef(function AffairTableTanstack(props, ref) {
   const [rawData, setRawData] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [sorting, setSorting] = useState([])
@@ -104,7 +105,7 @@ export default function AffairTableTanstack({ onRowClick }) {
 
   const columns = useMemo(() => defaultColumns, [])
 
-  useEffect(() => {
+  const loadData = () => {
     fetch(`${backendUrl}/old_apart`)
       .then(res => res.json())
       .then(json => {
@@ -117,7 +118,16 @@ export default function AffairTableTanstack({ onRowClick }) {
       .catch(err => {
         console.error('Ошибка при загрузке данных:', err)
       })
-  }, [])
+  };
+
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useImperativeHandle(ref, () => ({
+    reload: () => loadData(),
+  }));
 
   const table = useReactTable({
     data: filteredData,
@@ -177,7 +187,7 @@ export default function AffairTableTanstack({ onRowClick }) {
             </thead>
             <tbody>
               {table.getRowModel().rows.map(row => (
-                <tr key={row.id} className="hover:bg-gray-50" onClick={() => onRowClick?.(row.original)}>
+                <tr key={row.id} className="hover:bg-gray-50" onClick={() => props.onRowClick?.(row.original)}>
                   {row.getVisibleCells().map(cell => (
                     <td key={cell.id} className="px-3 py-2 border-b">
                       {flexRender(
@@ -194,4 +204,6 @@ export default function AffairTableTanstack({ onRowClick }) {
       </div>
     </div>
   )
-}
+})
+
+export default AffairTableTanstack;

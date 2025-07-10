@@ -1,4 +1,5 @@
 import { useState } from "react";
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 export function AddAffairModal({ problemsOptions, isOpen, setIsOpen, onSubmit }) {
 //   const [isOpen, setIsOpen] = useState(false);
@@ -15,12 +16,36 @@ export function AddAffairModal({ problemsOptions, isOpen, setIsOpen, onSubmit })
     problems: []
   });
 
-  const handleUrlChange = (e) => {
-    const url = e.target.value;
-    const params = new URLSearchParams(url.split("?")[1]);
-    const affair_id = Number(params.get("ObjId")) || 0;
-    setForm(prev => ({ ...prev, affair_id }));
-  };
+const handleUrlChange = async (e) => {
+  const url = e.target.value;
+  const params = new URLSearchParams(url.split("?")[1]);
+  const affair_id = Number(params.get("ObjId")) || 0;
+
+  setForm(prev => ({ ...prev, affair_id }));
+
+  if (affair_id) {
+    try {
+      const response = await fetch(`${backendUrl}/main/rsm/get_kpu_info?affair_id=${affair_id}`);
+      if (!response.ok) throw new Error("Ошибка запроса");
+      const data = await response.json();
+
+      setForm(prev => ({
+        ...prev,
+        affair_id: data.affair_id || affair_id,
+        fio: data.fio || "",
+        district: data.district || "",
+        municipal_district: data.municipal_district || "",
+        house_address: data.house_address || "",
+        apart_number: data.apart_number || "",
+        kpu: data.kpu || "",
+        unom: data.unom || "",
+        // room_apart_number и problems не заполняем с сервера
+      }));
+    } catch (error) {
+      console.error("Ошибка загрузки данных:", error);
+    }
+  }
+};
 
   const handleChange = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));

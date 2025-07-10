@@ -9,8 +9,8 @@ router = APIRouter(prefix='/old_apart', tags=['Проблемные кварти
 @router.get('')
 async def get_old_apart():
     result = await (old_apart_repository.get_old_apart())
-    rsm = RsmService()
-    await rsm.get_kpu_info(1033628)
+    # rsm = RsmService()
+    # await rsm.get_kpu_info(1033628)
     return result
 
 @router.get('/{affair_id}/get_stages')
