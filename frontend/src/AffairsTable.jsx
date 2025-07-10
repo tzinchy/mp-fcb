@@ -97,8 +97,8 @@ export default function AffairTableTanstack({ onRowClick }) {
     const lower = searchTerm.toLowerCase()
     return rawData.filter(
       row =>
-        row.fio.toLowerCase().includes(lower) ||
-        row.house_address.toLowerCase().includes(lower)
+        (row.kpu ?? '').toLowerCase().includes(lower) ||
+        (row.house_address ?? '').toLowerCase().includes(lower)
     )
   }, [searchTerm, rawData])
 
@@ -134,7 +134,7 @@ export default function AffairTableTanstack({ onRowClick }) {
       <div className="mb-2 grid-3">
         <input
           type="text"
-          placeholder="Поиск по ФИО или адресу..."
+          placeholder="Поиск по КПУ или адресу..."
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           className="w-[30vh] px-3 py-2 border border-gray-300 rounded"
