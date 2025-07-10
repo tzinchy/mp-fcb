@@ -71,6 +71,28 @@ const defaultColumns = [
     },
   },
   { accessorKey: 'apart_number', header: 'Кв.' },
+    
+  {
+    header: 'Проблемы',
+    accessorKey: 'problems',
+    cell: ({ row }) => {
+      const d = row.original
+      return (
+        <div className="leading-tight">
+          {Array.isArray(d.problems) && d.problems.length > 0 ? (
+            <div>
+              {d.problems.map((p, i) => (
+                <div>{p}</div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400 italic">нет</div>
+          )}
+        </div>
+      )
+    },
+  },
+
   {
     header: 'Статус',
     accessorKey: 'status',
@@ -81,6 +103,22 @@ const defaultColumns = [
           <div>{d.status}</div>
           {d.status_date && (
             <div className="text-gray-500 text-xs">{format(parseISO(d.status_date), 'dd.MM.yyyy HH:mm')}</div>
+          )}
+        </div>
+      )
+    },
+  },
+
+  {
+    header: 'Активный этап',
+    accessorKey: 'active_stage',
+    cell: ({ row }) => {
+      const d = row.original
+      return (
+        <div className="leading-tight">
+          <div>{d.last_stage_name}</div>
+          {d.last_stage_date && (
+            <div className="text-gray-500 text-xs">{format(parseISO(d.last_stage_date), 'dd.MM.yyyy HH:mm')}</div>
           )}
         </div>
       )

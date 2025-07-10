@@ -24,15 +24,33 @@ class OldApartRepository:
                     'apart_number', o.apart_number,
                     'status', s.status,
                     'status_date', o.status_date,
-                    'problems', o.problems,
-					'affair_id', affair_id,
-                    'created_at', o.created_at
+                    'problems', p.problem_list,
+                    'affair_id', o.affair_id,
+                    'created_at', o.created_at,
+                    'last_stage_id', stg.stage_id,
+                    'last_stage_name', stg.stage,
+                    'last_stage_date', stg.created_at
                 )
             ) AS combined_json
-            FROM 
-                mprg.old_apart o
-            JOIN 
-                mprg.status s ON o.status_id = s.status_id;'''))
+            FROM mprg.old_apart o
+            JOIN mprg.status s ON o.status_id = s.status_id
+
+            -- 👇 Подтягиваем проблемы
+            LEFT JOIN LATERAL (
+                SELECT jsonb_agg(pr.problem ORDER BY pr.problem) AS problem_list
+                FROM unnest(o.problems) AS pid
+                JOIN mprg.problems pr ON pr.problem_id = pid
+            ) p ON true
+
+            -- 👇 Подтягиваем последний этап
+            LEFT JOIN LATERAL (
+                SELECT sh.stage_id, st.stage, sh.created_at
+                FROM mprg.stage_history sh
+                JOIN mprg.stage st ON st.stage_id = sh.stage_id
+                WHERE sh.affair_id = o.affair_id
+                ORDER BY sh.created_at DESC
+                LIMIT 1
+            ) stg ON true;'''))
             
             row = result.fetchone()
             return row[0] if row else {}
