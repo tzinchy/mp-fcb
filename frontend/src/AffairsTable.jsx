@@ -127,19 +127,33 @@ const defaultColumns = [
 ]
 
 const AffairTableTanstack = forwardRef(function AffairTableTanstack(props, ref) {
-  const [rawData, setRawData] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sorting, setSorting] = useState([])
+  const [rawData, setRawData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sorting, setSorting] = useState([]);
+  const [filterProblems, setFilterProblems] = useState('');
+const [filterDistrict, setFilterDistrict] = useState('');
+const [filterStage, setFilterStage] = useState('');
 
-  // Фильтрация
-  const filteredData = useMemo(() => {
-    const lower = searchTerm.toLowerCase()
-    return rawData.filter(
-      row =>
-        (row.kpu ?? '').toLowerCase().includes(lower) ||
-        (row.house_address ?? '').toLowerCase().includes(lower)
-    )
-  }, [searchTerm, rawData])
+const filteredData = useMemo(() => {
+  const lower = searchTerm.toLowerCase();
+
+  return rawData.filter(row => {
+    const matchSearch =
+      (row.kpu ?? '').toLowerCase().includes(lower) ||
+      (row.house_address ?? '').toLowerCase().includes(lower);
+
+    const matchProblem =
+      !filterProblems || (row.problems || []).includes(filterProblems);
+
+    const matchDistrict =
+      !filterDistrict || row.district === filterDistrict;
+
+    const matchStage =
+      !filterStage || row.status === filterStage;
+
+    return matchSearch && matchProblem && matchDistrict && matchStage;
+  });
+}, [searchTerm, filterProblems, filterDistrict, filterStage, rawData]);
 
   const columns = useMemo(() => defaultColumns, [])
 
@@ -179,15 +193,48 @@ const AffairTableTanstack = forwardRef(function AffairTableTanstack(props, ref) 
 
   return (
     <div className="px-4">
-      <div className="mb-2 grid-3">
-        <input
-          type="text"
-          placeholder="Поиск по КПУ или адресу..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          className="w-[30vh] px-3 py-2 border border-gray-300 rounded"
-        />
-      </div>
+<div className="mb-2 flex gap-2 flex-wrap">
+  <input
+    type="text"
+    placeholder="Поиск по КПУ или адресу..."
+    value={searchTerm}
+    onChange={e => setSearchTerm(e.target.value)}
+    className="px-3 py-2 border border-gray-300 rounded"
+  />
+
+  <select
+    value={filterProblems}
+    onChange={e => setFilterProblems(e.target.value)}
+    className="px-3 py-2 border border-gray-300 rounded"
+  >
+    <option value="">Проблема</option>
+    {Array.from(new Set(rawData.flatMap(row => row.problems || []))).map((prob, i) => (
+      <option key={i} value={prob}>{prob}</option>
+    ))}
+  </select>
+
+  <select
+    value={filterDistrict}
+    onChange={e => setFilterDistrict(e.target.value)}
+    className="px-3 py-2 border border-gray-300 rounded"
+  >
+    <option value="">Округ</option>
+    {Array.from(new Set(rawData.map(row => row.district))).map((d, i) => (
+      <option key={i} value={d}>{d}</option>
+    ))}
+  </select>
+
+  <select
+    value={filterStage}
+    onChange={e => setFilterStage(e.target.value)}
+    className="px-3 py-2 border border-gray-300 rounded"
+  >
+    <option value="">Статус</option>
+    {Array.from(new Set(rawData.map(row => row.status))).map((s, i) => (
+      <option key={i} value={s}>{s}</option>
+    ))}
+  </select>
+</div>
 
       <div className="overflow-hidden border border-gray-300 rounded">
         <div className="max-h-[calc(100vh-210px)] overflow-y-auto">
