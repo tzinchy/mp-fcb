@@ -23,6 +23,7 @@ class OldApartRepository:
                     'house_address', o.house_address,
                     'apart_number', o.apart_number,
                     'status', s.status,
+                    'status_date', o.status_date,
                     'problems', o.problems,
 					'affair_id', affair_id
                 )
@@ -106,6 +107,7 @@ class OldApartRepository:
                 )
             
             await session.commit()
+            await self.update_status_id(affair_id=affair_id, new_stage_id=next_stage_id)
             return await self.get_stage_history(affair_id=affair_id)
     
     async def create_old_apart(self, old_apart: OldApartBase) -> OldApart:
@@ -119,5 +121,31 @@ class OldApartRepository:
             await session.refresh(apart)
             
             return apart
+        
+
+    async def update_status_id(self, affair_id :int, new_stage_id :int):
+        async with self.create_session() as session: 
+            await session.execute(text(
+                """
+                WITH new_status AS (
+                SELECT stage.status_id FROM stage WHERE stage.stage_id = :next_stage_id
+                )
+
+                UPDATE mprg.old_apart
+                SET
+                status_id = new_status.status_id,
+                status_date = NOW()
+                FROM new_status
+                WHERE
+                old_apart.affair_id = :affair_id
+                AND old_apart.status_id IS DISTINCT FROM new_status.status_id;
+                """
+            ), {'affair_id' : affair_id, 
+                'next_stage_id' : new_stage_id
+                }
+                )
+            
+            await session.commit()
+            return await self.get_stage_history(affair_id=affair_id)
         
         
