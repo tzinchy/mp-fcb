@@ -4,7 +4,7 @@ import { parseISO, format } from 'date-fns'
 import {CircleCheck, Circle} from 'lucide-react'
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setStages }) {
+export default function AffairsTimeline({ problems, setNextPages, apartmentDetails, setStages, onAfterStageComplete }) {
   const [activeTab, setActiveTab] = useState(
     problems.length > 0 ? problems[0].problem_id : null
   )
@@ -150,6 +150,7 @@ const handleSubmit = async (data) => {
               Завершение: {activeStageName}
             </h3>
             <StageCompletionForm
+              onAfterSubmit={onAfterStageComplete}
               nextStages={currentNextStages}
               onSubmit={handleSubmit}
               apartmentDetails={apartmentDetails}

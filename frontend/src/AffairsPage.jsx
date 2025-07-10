@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AffairsDetails from "./AffairsHistory";
 import AffairTableTanstack from "./AffairsTable";
 import { AddAffairModal } from "./AddAffairModal";
@@ -10,6 +10,14 @@ export default function AffairsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [problemsOptions, setProblemsOptions] = useState([]);
   const apartmentDetails = selectedRow || null;
+
+  const tableRef = useRef();
+
+  const handleReloadTable = () => {
+    tableRef.current?.reload(); // вызов метода reload у таблицы
+  };
+
+
 
   useEffect(() => {
     fetch(`${backendUrl}/main/all_problems`)
@@ -43,12 +51,13 @@ export default function AffairsPage() {
             Добавить запись
           </button>
         </div>
-        <AffairTableTanstack
-          onRowClick={(rowData) => {
-            setSelectedRow(rowData);
-            setIsDetailsVisible(true);
-          }}
-        />
+<AffairTableTanstack
+  ref={tableRef}
+  onRowClick={(rowData) => {
+    setSelectedRow(rowData);
+    setIsDetailsVisible(true);
+  }}
+/>
       </div>
 
       {/* Правая часть — детали */}
@@ -60,6 +69,7 @@ export default function AffairsPage() {
       >
         <div className="h-full flex flex-col shadow-lg bg-white">
           <AffairsDetails
+            onAfterStageComplete={handleReloadTable}
             setIsDetailsVisible={setIsDetailsVisible}
             setSelectedRow={setSelectedRow}
             apartmentDetails={apartmentDetails}
@@ -73,6 +83,7 @@ export default function AffairsPage() {
         <AddAffairModal
           isOpen={isAddModalOpen}
           setIsOpen={setIsAddModalOpen}
+          onAfterSubmit={handleReloadTable}
           problemsOptions={problemsOptions}
 onSubmit={async (data) => {
   try {
@@ -91,6 +102,8 @@ onSubmit={async (data) => {
 
     const result = await response.json();
     console.log("Успешно добавлено:", result);
+
+    handleReloadTable(); // 🔥 обновить таблицу после добавления
     setIsAddModalOpen(false);
   } catch (error) {
     console.error("Ошибка при добавлении дела:", error);

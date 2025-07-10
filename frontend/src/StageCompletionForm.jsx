@@ -1,6 +1,13 @@
 import React, { useState } from 'react'
 
-export default function StageCompletionForm({ nextStages = [], onSubmit, activeStageName, apartmentDetails, activeStageHistoryId }) {
+export default function StageCompletionForm({
+  nextStages = [],
+  onSubmit,
+  onAfterSubmit, // 👈 добавляем
+  activeStageName,
+  apartmentDetails,
+  activeStageHistoryId
+}) {
   const [docNumber, setDocNumber] = useState('')
   const [docDate, setDocDate] = useState('')
   const [note, setNote] = useState('')
@@ -10,20 +17,27 @@ export default function StageCompletionForm({ nextStages = [], onSubmit, activeS
     return ''
   })
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!docNumber || !docDate || !selectedStage) {
       alert('Пожалуйста, заполните все обязательные поля.')
       return
     }
 
-    onSubmit({
-      affair_id: apartmentDetails.affair_id,
-      doc_number: docNumber,
-      doc_date: docDate,
-      note,
-      next_stage_id: Number(selectedStage),
-      current_stage_history_id: activeStageHistoryId
-    })
+    try {
+      await onSubmit({
+        affair_id: apartmentDetails.affair_id,
+        doc_number: docNumber,
+        doc_date: docDate,
+        note,
+        next_stage_id: Number(selectedStage),
+        current_stage_history_id: activeStageHistoryId
+      })
+
+      // 🔥 после успешной отправки
+      onAfterSubmit?.()
+    } catch (err) {
+      console.error('Ошибка завершения этапа:', err)
+    }
   }
 
   return (

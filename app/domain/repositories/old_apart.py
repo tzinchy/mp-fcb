@@ -23,14 +23,34 @@ class OldApartRepository:
                     'house_address', o.house_address,
                     'apart_number', o.apart_number,
                     'status', s.status,
-                    'problems', o.problems,
-					'affair_id', affair_id
+                    'status_date', o.status_date,
+                    'problems', p.problem_list,
+                    'affair_id', o.affair_id,
+                    'created_at', o.created_at,
+                    'last_stage_id', stg.stage_id,
+                    'last_stage_name', stg.stage,
+                    'last_stage_date', stg.created_at
                 )
             ) AS combined_json
-            FROM 
-                mprg.old_apart o
-            JOIN 
-                mprg.status s ON o.status_id = s.status_id;'''))
+            FROM mprg.old_apart o
+            JOIN mprg.status s ON o.status_id = s.status_id
+
+            -- 👇 Подтягиваем проблемы
+            LEFT JOIN LATERAL (
+                SELECT jsonb_agg(pr.problem ORDER BY pr.problem) AS problem_list
+                FROM unnest(o.problems) AS pid
+                JOIN mprg.problems pr ON pr.problem_id = pid
+            ) p ON true
+
+            -- 👇 Подтягиваем последний этап
+            LEFT JOIN LATERAL (
+                SELECT sh.stage_id, st.stage, sh.created_at
+                FROM mprg.stage_history sh
+                JOIN mprg.stage st ON st.stage_id = sh.stage_id
+                WHERE sh.affair_id = o.affair_id
+                ORDER BY sh.created_at DESC
+                LIMIT 1
+            ) stg ON true;'''))
             
             row = result.fetchone()
             return row[0] if row else {}
@@ -106,6 +126,7 @@ class OldApartRepository:
                 )
             
             await session.commit()
+            await self.update_status_id(affair_id=affair_id, new_stage_id=next_stage_id)
             return await self.get_stage_history(affair_id=affair_id)
     
     async def create_old_apart(self, old_apart: OldApartBase) -> OldApart:
@@ -119,5 +140,31 @@ class OldApartRepository:
             await session.refresh(apart)
             
             return apart
+        
+
+    async def update_status_id(self, affair_id :int, new_stage_id :int):
+        async with self.create_session() as session: 
+            await session.execute(text(
+                """
+                WITH new_status AS (
+                SELECT stage.status_id FROM stage WHERE stage.stage_id = :next_stage_id
+                )
+
+                UPDATE mprg.old_apart
+                SET
+                status_id = new_status.status_id,
+                status_date = NOW()
+                FROM new_status
+                WHERE
+                old_apart.affair_id = :affair_id
+                AND old_apart.status_id IS DISTINCT FROM new_status.status_id;
+                """
+            ), {'affair_id' : affair_id, 
+                'next_stage_id' : new_stage_id
+                }
+                )
+            
+            await session.commit()
+            return await self.get_stage_history(affair_id=affair_id)
         
         

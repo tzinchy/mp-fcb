@@ -2,12 +2,15 @@ from api.v1.dependencies import old_apart_repository
 from domain.dtos.stages import SetNewStage, StageHistoryResponse
 from fastapi import APIRouter
 from domain.dtos.old_apart import OldApartBase
+from domain.services.rsm_service import RsmService
 
 router = APIRouter(prefix='/old_apart', tags=['Проблемные квартиры'])
 
 @router.get('')
 async def get_old_apart():
     result = await (old_apart_repository.get_old_apart())
+    # rsm = RsmService()
+    # await rsm.get_kpu_info(1033628)
     return result
 
 @router.get('/{affair_id}/get_stages')
