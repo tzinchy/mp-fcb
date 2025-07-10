@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react'
+import { parseISO, format } from 'date-fns'
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,12 +10,81 @@ import {
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const defaultColumns = [
-  { accessorKey: 'affair_id', header: 'ID' },
-  { accessorKey: 'kpu', header: 'КПУ' },
-  { accessorKey: 'fio', header: 'ФИО' },
-  { accessorKey: 'house_address', header: 'Адрес дома' },
+//   { accessorKey: 'affair_id', header: 'ID' },
+//   { accessorKey: 'kpu', header: 'КПУ' },
+  {
+    header: 'КПУ',
+    accessorKey: 'kpu',
+    cell: ({ row }) => {
+      const d = row.original
+      return (
+        <div className="leading-tight">
+          <div>{d.kpu}</div>
+          <div className="text-gray-500 text-xs">{d.fio}</div>
+        </div>
+      )
+    },
+  },
+{
+  header: 'Дата выявления',
+  accessorKey: 'created_at',
+  cell: ({ row }) => {
+    const d = row.original
+    const dateStr = d.created_at
+    let content = '-'
+    let formattedDate = '-'
+
+    if (dateStr) {
+      const statusDate = new Date(dateStr)
+      const now = new Date()
+      const diffTime = now - statusDate
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      content = `прошло ${diffDays} дн.`
+
+      try {
+        formattedDate = format(parseISO(dateStr), 'dd.MM.yyyy HH:mm')
+      } catch {
+        formattedDate = '-'
+      }
+    }
+
+    return (
+      <div className="leading-tight">
+        <div>{formattedDate}</div>
+        <div className="text-gray-500 text-xs">{content}</div>
+      </div>
+    )
+  },},
+//   { accessorKey: 'fio', header: 'ФИО' },
+  {
+    header: 'Адрес',
+    accessorKey: 'house_address',
+    cell: ({ row }) => {
+      const d = row.original
+      return (
+        <div className="leading-tight">
+          <div>{d.house_address}</div>
+          <div className="text-gray-500 text-xs">{d.district}, {d.municipal_district}</div>
+        </div>
+      )
+    },
+  },
   { accessorKey: 'apart_number', header: 'Кв.' },
-  { accessorKey: 'status', header: 'Статус' },
+  {
+    header: 'Статус',
+    accessorKey: 'status',
+    cell: ({ row }) => {
+      const d = row.original
+      return (
+        <div className="leading-tight">
+          <div>{d.status}</div>
+          {d.status_date && (
+            <div className="text-gray-500 text-xs">{format(parseISO(d.status_date), 'dd.MM.yyyy HH:mm')}</div>
+          )}
+        </div>
+      )
+    },
+  },
 ]
 
 export default function AffairTableTanstack({ onRowClick }) {

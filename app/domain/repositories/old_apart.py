@@ -25,7 +25,8 @@ class OldApartRepository:
                     'status', s.status,
                     'status_date', o.status_date,
                     'problems', o.problems,
-					'affair_id', affair_id
+					'affair_id', affair_id,
+                    'created_at', o.created_at
                 )
             ) AS combined_json
             FROM 
